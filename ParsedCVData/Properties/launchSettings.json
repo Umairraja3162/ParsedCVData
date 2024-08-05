@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ParsedCVData": {
+      "commandName": "Project",
+      "commandLineArgs": "generate 1"
+    }
+  }
+}
