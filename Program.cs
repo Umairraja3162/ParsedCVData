@@ -342,45 +342,24 @@ namespace ParsedCVData
                         AddEducation(doc, education, sectionColor, splitPoint);
                     }
 
-                    //// Add Work Experience
-                    //JToken workExperience = cvData["Experience"];
-                    //if (workExperience != null && workExperience.HasValues)
-                    //{
-                    //    AddSectionTitle(doc, "Work Experience".ToUpper(), titleColor, sectionColor, splitPoint);
-                    //    AddWorkExperience(doc, workExperience, sectionColor, splitPoint);
-                    //}
-
                     // Add Work Experience
                     JToken workExperience = cvData["Experience"];
                     if (workExperience != null && workExperience.HasValues)
                     {
-                        bool hasData = false;
-
-                        if (workExperience.Type == JTokenType.Array)
-                        {
-                            // Check if the array contains any non-empty elements
-                            hasData = workExperience.Children().Any(item => item.Type == JTokenType.Object && item.Children().Any());
-                        }
-                        else if (workExperience.Type == JTokenType.Object)
-                        {
-                            // Check if the object contains any non-empty properties
-                            hasData = workExperience.Children<JProperty>().Any(prop => prop.Value.Type == JTokenType.Array && prop.Value.Children().Any()) ||
-                                      workExperience.Children<JProperty>().Any(prop => prop.Value.Type == JTokenType.Object && prop.Value.Children().Any()) ||
-                                      workExperience.Children<JProperty>().Any(prop => !string.IsNullOrWhiteSpace(prop.Value.ToString()));
-                        }
-
-                        if (hasData)
-                        {
-                            AddSectionTitle(doc, "Work Experience".ToUpper(), titleColor, sectionColor, splitPoint);
-                            AddWorkExperience(doc, workExperience, sectionColor, splitPoint);
-                        }
+                        AddSectionTitle(doc, "Work Experience".ToUpper(), titleColor, sectionColor, splitPoint);
+                        AddWorkExperience(doc, workExperience, sectionColor, splitPoint);
                     }
 
-
-
-
-                    // Handle only "Project Details"
-                    JToken projectData = cvData["Project Details"] as JArray;
+                    // Determine which projects key to use
+                    JToken projectData = cvData["ProjectDetails"] as JArray;
+                    if (projectData == null)
+                    {
+                        projectData = cvData["Projects"] as JArray;
+                    }
+                    if (projectData == null)
+                    {
+                        projectData = cvData["Project_Details"] as JArray;
+                    }
 
                     // Add Project Details
                     if (projectData != null && projectData.HasValues)
@@ -388,9 +367,6 @@ namespace ParsedCVData
                         AddSectionTitle(doc, "Projects".ToUpper(), titleColor, sectionColor, splitPoint);
                         AddProjects(doc, projectData, sectionColor, splitPoint);
                     }
-
-
-
 
                     // Add Certifications
                     JToken certifications = cvData["Certifications"];
@@ -414,6 +390,7 @@ namespace ParsedCVData
             }
         }
 
+   
         private static void AddSkills(Document doc, JToken skillsToken, BaseColor sectionColor, float splitPoint)
         {
             if (skillsToken == null)
@@ -691,6 +668,7 @@ namespace ParsedCVData
             }
         }
 
+     
         private static void AddProjects(Document doc, JToken projects, BaseColor sectionColor, float splitPoint)
         {
             if (projects == null)
@@ -713,7 +691,6 @@ namespace ParsedCVData
                 {
                     projectsArray = projectsArrayFromObject;
                 }
-
                 // Check for "Project_Details" as the last fallback
                 else if (obj["Project_Details"] is JArray projectDetailsArray2 && projectDetailsArray2.Any())
                 {
@@ -832,6 +809,7 @@ namespace ParsedCVData
                 doc.Add(new Paragraph("\n")); // Adds a line break
             }
         }
+
 
         private static void AddEducation(Document doc, JToken education, BaseColor sectionColor, float splitPoint)
         {
